@@ -21,7 +21,7 @@ const FailScreen = React.createClass({
 		// I try and set everything as required unless it's explicitly
 		// optional
 		score: React.PropTypes.number.isRequired,
-		fail: React.PropTypes.Object.isRequired // cursor to the fail state
+		fail: React.PropTypes.object.isRequired // cursor to the fail state
 	},
 
 	render: function () {
