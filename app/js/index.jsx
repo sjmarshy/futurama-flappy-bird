@@ -18,7 +18,7 @@ const width = 300;
 const gameState = new Baobab({
 	game: {
 
-		paused: true,
+		pause: true,
 
 		menu: true,
 
@@ -32,7 +32,9 @@ const gameState = new Baobab({
 
 		bird: {
 			velocity: 0,
-			position: height / 2
+			position: height / 2,
+			height: 50,
+			width: 50
 		},
 
 		obstacles: []
@@ -45,17 +47,37 @@ const gameState = new Baobab({
 // and the movement of the bird
 function updateGame(state, velocityMod) {
 
-	// bird movement first;
-	let bird = state.select("bird");
+	let pause = state.get("pause");
+	let fail = state.get("fail");
 
-	if (velocityMod > 0) {
-		bird.set("velocity", velocityMod);
+	if (!pause && !fail) {
+
+		// bird movement first;
+		let bird = state.select("bird");
+
+		if (velocityMod > 0) {
+			bird.set("velocity", velocityMod);
+		}
+
+		let bdata = bird.get();
+
+		let velocity = bdata.velocity;
+		let birdY = bdata.position;
+
+		let newPosition = birdY - velocity;
+
+		if (newPosition < height - (bird.get("height") / 2)) {
+			bird.set("position", newPosition);
+		} else {
+			state.set("fail", true);
+			state.set("pause", true);
+		}
+
+		if (velocity > -10) {
+			bird.set("velocity", velocity - 1);
+		}
+
 	}
-
-	let velocity = bird.get("velocity");
-	let birdY = bird.get("position");
-
-	bird.set("position", birdY - velocity);
 }
 
 // GameContainer - the root React component that will re-render all
@@ -68,22 +90,25 @@ const GameContainer = React.createClass({
 
 	render: function () {
 
-		let obstacles = this.state.game.obstacles.forEach(function (o) {
+		let data = this.state.cursor;
+
+		let obstacles = data.obstacles.forEach(function (o) {
 			return <Obstacle {...o} />;
 		});
 
-		let menu = this.state.game.menu ? <Menu/> : null;
+		let menu = data.menu ? <Menu/> : null;
 
 		let style = {
-			height: this.state.game.height,
-			width: this.state.game.width
+			height: data.height,
+			width: data.width,
+			backgroundColor: "grey"
 		};
 
 		return (
 			<div style={style} data-component-game>
 				{menu}
-				<ScoreDisplay score={this.state.game.score}/>
-				<Bird {...this.state.game.bird} />
+				<ScoreDisplay score={data.score}/>
+				<Bird {...data.bird} />
 				{obstacles}
 			</div>
 		);
@@ -101,16 +126,16 @@ var keys = new Keyboard("<space>");
 // handle the Keyboard and update game state
 function frame() {
 
-
-
 	let key = keys.get();
 	let velocityMod = 0;
+	let state = gameState.select("game");
 
-	if (key && key === "SPACE") {
-		velocityMod = 10;
+	if (key && key === "<space>") {
+		velocityMod = 20;
+		state.set("pause", false);
 	}
 
-	updateGame(gameState, velocityMod);
+	updateGame(state, velocityMod);
 
 	window.requestAnimationFrame(frame);
 }

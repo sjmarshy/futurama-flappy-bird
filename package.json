@@ -30,6 +30,11 @@
   "dependencies": {
     "baobab": "^0.4.0",
     "keydown": "0.0.3",
+    "koa": "^0.18.1",
+    "koa-static": "^1.4.9",
     "react": "^0.13.0"
+  },
+  "engines": {
+    "iojs": "1.5.0"
   }
 }
