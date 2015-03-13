@@ -2,6 +2,14 @@
 
 const React = require("react");
 const Baobab = require("baobab");
+const Keyboard = require("./keyboard");
+
+// components
+const Obstacle = require("./components/obstacle.jsx");
+
+// game constants
+const height = 500;
+const width = 300;
 
 // state object should go here
 const gameState = new Baobab({
@@ -15,15 +23,37 @@ const gameState = new Baobab({
 
 		score: 0,
 
+		height: height,
+
+		width: width,
+
 		bird: {
 			velocity: 0,
-			position: [0, 0]
+			position: height / 2
 		},
 
 		obstacles: []
 
 	}
 });
+
+
+// here we'll sort stuff like colision detection, generate new obstacles
+// and the movement of the bird
+function updateGame(state, velocityMod) {
+
+	// bird movement first;
+	let bird = state.select("bird");
+
+	if (velocityMod > 0) {
+		bird.set("velocity", velocityMod);
+	}
+
+	let velocity = bird.get("velocity");
+	let birdY = bird.get("position");
+
+	bird.set("position", birdY - velocity);
+}
 
 // GameContainer - the root React component that will re-render all
 // 	relevant children when the state changes.
@@ -58,10 +88,14 @@ React.render(
 	document.body
 );
 
+var keys = new Keyboard("<space>");
+
 // handle the Keyboard and update game state
 function frame() {
 
-	let key = Keyboard.get();
+
+
+	let key = keys.get();
 	let velocityMod = 0;
 
 	if (key && key === "SPACE") {
