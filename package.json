@@ -4,9 +4,32 @@
   "description": "Flappy Bird Clone",
   "main": "server.js",
   "scripts": {
+    "build": "browserify -t babelify app/js/index.jsx -o public/js/bundle.js",
+    "watch": "watchify -dv -t babelify app/js/index.jsx -o public/js/bundle.js",
     "test": "mocha"
   },
   "author": "Sam Marshall",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "eslintConfig": {
+    "ecmaFeatures": {
+      "blockBindings": true,
+      "jsx": true
+    },
+    "env": {
+      "browser": true,
+      "node": true
+    }
+  },
+  "devDependencies": {
+    "babelify": "^5.0.4",
+    "browserify": "^9.0.3",
+    "eslint": "^0.16.2",
+    "watchify": "^2.4.0"
+  },
+  "dependencies": {
+    "baobab": "^0.4.0",
+    "keydown": "0.0.3",
+    "react": "^0.13.0"
+  }
 }
