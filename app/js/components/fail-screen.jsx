@@ -11,7 +11,7 @@ function tryAgain(failCursor) {
 		// even though it's come a long way, this'll still
 		// cause an update of the root tree and, therefore, the
 		// root component
-		failCursor.set(false);
+		failCursor.edit(false);
 	};
 }
 
