@@ -101,7 +101,7 @@ const GameContainer = React.createClass({
 		let failScreen = data.fail ?
 			<FailScreen
 				score={data.score}
-				fail={this.cursor.get(["game", "fail"])} /> :
+				fail={this.cursor.select(["game", "fail"])} /> :
 			null;
 
 		let style = {
