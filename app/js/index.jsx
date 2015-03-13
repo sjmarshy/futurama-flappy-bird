@@ -13,7 +13,7 @@ const FailScreen = require("./components/fail-screen.jsx");
 
 // game constants
 const height = 500;
-const width = 300;
+const width = 700;
 
 // state object should go here
 const gameState = new Baobab({
@@ -34,6 +34,7 @@ const gameState = new Baobab({
 		bird: {
 			velocity: 0,
 			position: height / 2,
+			x: width / 2,
 			height: 50,
 			width: 50
 		},
@@ -42,6 +43,11 @@ const gameState = new Baobab({
 
 	}
 });
+
+gameState.on("update", function () {
+	console.dir(gameState.get());
+});
+
 
 
 // here we'll sort stuff like colision detection, generate new obstacles
@@ -72,6 +78,9 @@ function updateGame(state, velocityMod) {
 		} else {
 			state.set("fail", true);
 			state.set("pause", true);
+			bird.set("position", height / 2);
+			bird.set("velocity", 0);
+			return;
 		}
 
 		if (velocity > -10) {
@@ -101,22 +110,44 @@ const GameContainer = React.createClass({
 		let failScreen = data.fail ?
 			<FailScreen
 				score={data.score}
-				fail={this.cursor.select(["game", "fail"])} /> :
+				fail={this.cursor.select("fail")} /> :
 			null;
+
+		let score = data.fail ?
+			null :
+			<ScoreDisplay score={data.score} />;
 
 		let style = {
 			height: data.height,
 			width: data.width,
-			backgroundColor: "grey"
+			backgroundColor: "grey",
+			margin: 0,
+			padding: 0
 		};
 
 		return (
-			<div style={style} data-component-game>
-				{failScreen}
-				{menu}
-				<ScoreDisplay score={data.score}/>
-				<Bird {...data.bird} />
-				{obstacles}
+			<div>
+				<div
+					data-component-menu
+					style={{
+						position: "absolute",
+						display: "flex",
+						justifyContent: "center",
+						top: 0,
+						width: width,
+						height: height,
+						margin: 0,
+						padding: 10
+					}}>
+
+					{failScreen}
+					{menu}
+					{score}
+				</div>
+				<div style={style} data-component-game>
+					<Bird {...data.bird} />
+					{obstacles}
+				</div>
 			</div>
 		);
 	}

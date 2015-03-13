@@ -27,11 +27,6 @@ const FailScreen = React.createClass({
 	render: function () {
 
 		let style = {
-			main: {
-				margin: "auto",
-				height: 200,
-				width: 250
-			},
 			title: {
 				color: "red",
 				fontSize: 18
@@ -44,7 +39,7 @@ const FailScreen = React.createClass({
 		};
 
 		return (
-			<div style={style.main}>
+			<div>
 				<h2 style={style.title}>
 					Fail! You got {this.props.score}
 				</h2>
