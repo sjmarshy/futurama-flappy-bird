@@ -44,18 +44,29 @@ const gameState = new Baobab({
 	}
 });
 
-gameState.on("update", function () {
-	console.dir(gameState.get());
-});
+function genObstacle() {
 
+	let obstacleHeight = Math.random() *
+		((height * 0.75) - (height * 0.25)) + (height * 0.25);
 
+	return {
+		height: obstacleHeight,
+		width: 300,
+		x: 700,
+		top: height - obstacleHeight,
+		scored: false
+	};
+}
 
 // here we'll sort stuff like colision detection, generate new obstacles
 // and the movement of the bird
 function updateGame(state, velocityMod) {
 
+	const forwardVelocity = 7;
+
 	let pause = state.get("pause");
 	let fail = state.get("fail");
+	let obstacleChance = 0.0075;
 
 	if (!pause && !fail) {
 
@@ -87,6 +98,41 @@ function updateGame(state, velocityMod) {
 			bird.set("velocity", velocity - 1);
 		}
 
+		// obstacles
+
+		// pretty much a d10 system - if we `roll` under our chance,
+		// then we `fail` and an obstale is generated and added to the
+		// list
+		let rand = Math.random();
+
+		if (rand < obstacleChance) {
+			let obstacles = state.get("obstacles");
+
+			obstacles.push(genObstacle());
+
+			state.set("obstacles", obstacles);
+		}
+
+		// move every obstacle to the left until it's off the screen,
+		// then we can delete it.
+
+		let obstacles = state.get("obstacles");
+
+		state.set("obstacles", obstacles.map(function (o) {
+			o.x -= forwardVelocity;
+
+			if (o.x < -o.width) {
+				return null;
+			} else if (o.x < o.width - (width / 2) && !o.scored) {
+				let score = state.get("score");
+				state.set("score", score + 1);
+				o.scored = true;
+			}
+
+			return o;
+		}).filter(function (o) {
+			return !!o;
+		}));
 	}
 }
 
@@ -102,7 +148,7 @@ const GameContainer = React.createClass({
 
 		let data = this.state.cursor;
 
-		let obstacles = data.obstacles.forEach(function (o) {
+		let obstacles = data.obstacles.map(function (o) {
 			return <Obstacle {...o} />;
 		});
 
@@ -122,8 +168,10 @@ const GameContainer = React.createClass({
 			width: data.width,
 			backgroundColor: "grey",
 			margin: 0,
-			padding: 0
+			padding: 0,
+			overflow: "hidden"
 		};
+
 
 		return (
 			<div>
@@ -145,8 +193,8 @@ const GameContainer = React.createClass({
 					{score}
 				</div>
 				<div style={style} data-component-game>
-					<Bird {...data.bird} />
 					{obstacles}
+					<Bird {...data.bird} />
 				</div>
 			</div>
 		);
