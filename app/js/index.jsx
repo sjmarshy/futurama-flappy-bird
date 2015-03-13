@@ -9,6 +9,7 @@ const Obstacle = require("./components/obstacle.jsx");
 const Menu = require("./components/menu.jsx");
 const ScoreDisplay = require("./components/score-display.jsx");
 const Bird = require("./components/bird.jsx");
+const FailScreen = require("./components/fail-screen.jsx");
 
 // game constants
 const height = 500;
@@ -97,6 +98,11 @@ const GameContainer = React.createClass({
 		});
 
 		let menu = data.menu ? <Menu/> : null;
+		let failScreen = data.fail ?
+			<FailScreen
+				score={data.score}
+				fail={this.cursor.get(["game", "fail"])} /> :
+			null;
 
 		let style = {
 			height: data.height,
@@ -106,6 +112,7 @@ const GameContainer = React.createClass({
 
 		return (
 			<div style={style} data-component-game>
+				{failScreen}
 				{menu}
 				<ScoreDisplay score={data.score}/>
 				<Bird {...data.bird} />
@@ -130,7 +137,7 @@ function frame() {
 	let velocityMod = 0;
 	let state = gameState.select("game");
 
-	if (key && key === "<space>") {
+	if (key) {
 		velocityMod = 20;
 		state.set("pause", false);
 	}
