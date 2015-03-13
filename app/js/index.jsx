@@ -6,6 +6,9 @@ const Keyboard = require("./keyboard");
 
 // components
 const Obstacle = require("./components/obstacle.jsx");
+const Menu = require("./components/menu.jsx");
+const ScoreDisplay = require("./components/score-display.jsx");
+const Bird = require("./components/bird.jsx");
 
 // game constants
 const height = 500;
@@ -71,8 +74,13 @@ const GameContainer = React.createClass({
 
 		let menu = this.state.game.menu ? <Menu/> : null;
 
+		let style = {
+			height: this.state.game.height,
+			width: this.state.game.width
+		};
+
 		return (
-			<div data-component-game>
+			<div style={style} data-component-game>
 				{menu}
 				<ScoreDisplay score={this.state.game.score}/>
 				<Bird {...this.state.game.bird} />
