@@ -1,0 +1,12 @@
+{
+  "name": "flappy-bird",
+  "version": "0.1.0",
+  "description": "Flappy Bird Clone",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Sam Marshall",
+  "license": "MIT",
+  "private": true
+}
