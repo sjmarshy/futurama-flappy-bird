@@ -3,6 +3,7 @@
 const React = require("react");
 const Baobab = require("baobab");
 const Keyboard = require("./keyboard");
+const game = require("./game");
 
 // components
 const Obstacle = require("./components/obstacle.jsx");
@@ -15,15 +16,20 @@ const FailScreen = require("./components/fail-screen.jsx");
 const height = 500;
 const width = 700;
 
-// state object should go here
+// here we hold the state for the whole game. Rather than splitting the
+// state down on a component level, keeping all the state managed in a central
+// place inside a managed data structure means we know when any of it is
+// updated, and so when we need to update the screen.
 const gameState = new Baobab({
 	game: {
 
-		pause: true,
+		pause: true, // we'll start the game paused
 
-		menu: true,
+		menu: true, // and when a menu is implemented we'll start with it showing
 
 		fail: false,
+
+		reset: false, // we use this as a trigger to reset the game
 
 		score: 0,
 
@@ -33,108 +39,36 @@ const gameState = new Baobab({
 
 		bird: {
 			velocity: 0,
+			// position is the variable amount on the y axis
+			// we'll start the bird in the centre of the screen
 			position: height / 2,
 			x: width / 2,
 			height: 50,
 			width: 50
 		},
 
-		obstacles: []
+		obstacle: {
+
+			obstacles: [],
+
+			velocity: 7,
+
+			width: 150,
+			height: {
+				min: 0.25,
+				max: 0.45
+			},
+
+			// the min/max number of seconds between obstacles
+			// appearing
+			timing: {
+				min: 1000,
+				max: 2500
+			}
+		}
 
 	}
 });
-
-function genObstacle() {
-
-	let obstacleHeight = Math.random() *
-		((height * 0.75) - (height * 0.25)) + (height * 0.25);
-
-	return {
-		height: obstacleHeight,
-		width: 300,
-		x: 700,
-		top: height - obstacleHeight,
-		scored: false
-	};
-}
-
-// here we'll sort stuff like colision detection, generate new obstacles
-// and the movement of the bird
-function updateGame(state, velocityMod) {
-
-	const forwardVelocity = 7;
-
-	let pause = state.get("pause");
-	let fail = state.get("fail");
-	let obstacleChance = 0.0075;
-
-	if (!pause && !fail) {
-
-		// bird movement first;
-		let bird = state.select("bird");
-
-		if (velocityMod > 0) {
-			bird.set("velocity", velocityMod);
-		}
-
-		let bdata = bird.get();
-
-		let velocity = bdata.velocity;
-		let birdY = bdata.position;
-
-		let newPosition = birdY - velocity;
-
-		if (newPosition < height - (bird.get("height") / 2)) {
-			bird.set("position", newPosition);
-		} else {
-			state.set("fail", true);
-			state.set("pause", true);
-			bird.set("position", height / 2);
-			bird.set("velocity", 0);
-			return;
-		}
-
-		if (velocity > -10) {
-			bird.set("velocity", velocity - 1);
-		}
-
-		// obstacles
-
-		// pretty much a d10 system - if we `roll` under our chance,
-		// then we `fail` and an obstale is generated and added to the
-		// list
-		let rand = Math.random();
-
-		if (rand < obstacleChance) {
-			let obstacles = state.get("obstacles");
-
-			obstacles.push(genObstacle());
-
-			state.set("obstacles", obstacles);
-		}
-
-		// move every obstacle to the left until it's off the screen,
-		// then we can delete it.
-
-		let obstacles = state.get("obstacles");
-
-		state.set("obstacles", obstacles.map(function (o) {
-			o.x -= forwardVelocity;
-
-			if (o.x < -o.width) {
-				return null;
-			} else if (o.x < o.width - (width / 2) && !o.scored) {
-				let score = state.get("score");
-				state.set("score", score + 1);
-				o.scored = true;
-			}
-
-			return o;
-		}).filter(function (o) {
-			return !!o;
-		}));
-	}
-}
 
 // GameContainer - the root React component that will re-render all
 // 	relevant children when the state changes.
@@ -148,8 +82,8 @@ const GameContainer = React.createClass({
 
 		let data = this.state.cursor;
 
-		let obstacles = data.obstacles.map(function (o) {
-			return <Obstacle {...o} />;
+		let obstacles = data.obstacle.obstacles.map(function (o) {
+			return <Obstacle key={o.created} {...o} />;
 		});
 
 		let menu = data.menu ? <Menu/> : null;
@@ -169,7 +103,9 @@ const GameContainer = React.createClass({
 			backgroundColor: "grey",
 			margin: 0,
 			padding: 0,
-			overflow: "hidden"
+			overflow: "hidden",
+			position: "absolute",
+			zIndex: -1
 		};
 
 
@@ -216,13 +152,17 @@ function frame() {
 	let velocityMod = 0;
 	let state = gameState.select("game");
 
+	// as our keyboard buffer is only looking for the
+	// space key, this should only exist when a space
+	// key has been hit
 	if (key) {
 		velocityMod = 20;
 		state.set("pause", false);
 	}
 
-	updateGame(state, velocityMod);
+	game.updateGame(state, velocityMod);
 
+	// and loop (well, recur)
 	window.requestAnimationFrame(frame);
 }
 
