@@ -6,6 +6,17 @@ function intBetween(min, max) {
     return Math.random() * (max - min) + min;
 }
 
+function setHighScore(score) {
+
+    let hs = window.localStorage.getItem("highscore");
+
+    if (!hs || hs < score) {
+        window.localStorage.setItem("highscore", score);
+        return score;
+    }
+    return hs;
+}
+
 function genObstacle(state) {
 
     let opt = state.get("obstacle");
@@ -17,12 +28,14 @@ function genObstacle(state) {
 
     let obstacleHeight = intBetween(minObstacleHeight, maxObstacleHeight);
 
+    let obstacleY = intBetween(0, height);
+
     return {
         height: obstacleHeight,
         width: opt.width,
         x: width,
-        top: height - obstacleHeight, // for now we'll have the
-        // obstacles `stuck` to the floor
+        y: obstacleY,
+        top: obstacleY - (obstacleHeight / 2),
         scored: false, // has the player recieved a score for this obstacle?
         created: Date.now()
     };
@@ -33,7 +46,63 @@ function birdCollided(bird, state) {
     let position = bird.get("position");
     let bottom = state.get("height");
 
-    return position > bottom - (bird.get("height") / 2);
+    let bx = bird.get("x");
+    let bw = bird.get("width");
+    let bh = bird.get("height");
+
+    // bird
+    let t1 = position - (bh / 2);
+    let l1 = bx - (bw / 2);
+    let b1 = t1 + bh;
+    let r1 = l1 + bw;
+
+    // collision: if any of the birds vertices are
+    // inside the bounds of the obstacle, then we're colliding
+    let vertices = [
+        [l1, t1], // topleft
+        [r1, t1], // topright
+        [r1, b1], // bottomright
+        [l1, b1] // bottomleft
+    ];
+
+    let obstacles = state.get("obstacle", "obstacles");
+
+    let collided = obstacles.reduce(function(m, o) {
+
+        if (m) {
+            return m;
+        }
+
+        // obstacle
+        let t2 = o.top;
+        let l2 = o.x;
+        let b2 = o.top + o.height;
+        let r2 = l2 + o.width;
+
+        return vertices.reduce(function(m, v) {
+
+            let x = v[0],
+                y = v[1];
+
+
+            if (m) {
+                return m;
+            }
+
+            let collision = x > l2 &&
+                x < r2 &&
+                y > t2 &&
+                y < b2;
+
+            console.log(collision);
+
+            return collision;
+
+        }, false);
+    }, false);
+
+    return position > bottom - (bird.get("height") / 2) ||
+        collided;
 }
 
 function updateBird(birdCursor, velocityMod) {
@@ -66,7 +135,8 @@ function moveObstacles(state) {
 
         if (o.x < -o.width) {
             return null;
-        } else if (o.x < o.width - (width / 2) && !o.scored) {
+        } else if (o.x < width / 2 && !o.scored) {
+            console.log("hey");
             let score = state.get("score");
             state.set("score", score + 1);
             o.scored = true;
@@ -87,8 +157,13 @@ function failGame(state) {
     state.set("fail", true);
     state.set("pause", true);
 
+    state.select("obstacle").set("obstacles", []);
+
     bird.set("position", height / 2);
     bird.set("velocity", 0);
+
+    state.set("highscore", setHighScore(state.get("score")));
+
 }
 
 function addObstacle(state) {
@@ -102,10 +177,6 @@ function addObstacle(state) {
 }
 
 function updateGame(state, velocityMod) {
-
-    state.on("update", function() {
-        console.dir(state.get());
-    });
 
     let pause = state.get("pause");
     let fail = state.get("fail");

@@ -33,6 +33,8 @@ const gameState = new Baobab({
 
 		score: 0,
 
+		highscore: window.localStorage.getItem("highscore") || 0,
+
 		height: height,
 
 		width: width,
@@ -55,15 +57,15 @@ const gameState = new Baobab({
 
 			width: 150,
 			height: {
-				min: 0.25,
-				max: 0.45
+				min: 0.35,
+				max: 0.55
 			},
 
 			// the min/max number of seconds between obstacles
 			// appearing
 			timing: {
 				min: 1000,
-				max: 2500
+				max: 4500
 			}
 		}
 
@@ -89,7 +91,8 @@ const GameContainer = React.createClass({
 		let menu = data.menu ? <Menu/> : null;
 		let failScreen = data.fail ?
 			<FailScreen
-				score={data.score}
+				highscore={this.cursor.get("highscore")}
+				score={this.cursor.select("score")}
 				fail={this.cursor.select("fail")} /> :
 			null;
 

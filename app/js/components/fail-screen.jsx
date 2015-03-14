@@ -2,7 +2,7 @@
 
 const React = require("react");
 
-function tryAgain(failCursor) {
+function tryAgain(failCursor, scoreCursor) {
 	// this has to be called when the thing is actually clicked on - but
 	// I wanted to make the function private to prevent it being called by
 	// an external force - so closures + first class functions
@@ -12,6 +12,7 @@ function tryAgain(failCursor) {
 		// cause an update of the root tree and, therefore, the
 		// root component
 		failCursor.edit(false);
+		scoreCursor.edit(0);
 	};
 }
 
@@ -20,7 +21,8 @@ const FailScreen = React.createClass({
 	propTypes: {
 		// I try and set everything as required unless it's explicitly
 		// optional
-		score: React.PropTypes.number.isRequired,
+		score: React.PropTypes.object.isRequired,
+		highscore: React.PropTypes.number.isRequired,
 		fail: React.PropTypes.object.isRequired // cursor to the fail state
 	},
 
@@ -41,11 +43,14 @@ const FailScreen = React.createClass({
 		return (
 			<div>
 				<h2 style={style.title}>
-					Fail! You got {this.props.score}
+					Fail! You got {this.props.score.get()}
 				</h2>
+				<p>
+					your highscore is {this.props.highscore}
+				</p>
 				<span
 					style={style.span}
-					onClick={tryAgain(this.props.fail)}>
+					onClick={tryAgain(this.props.fail, this.props.score)}>
 					Try again?
 				</span>
 			</div>
