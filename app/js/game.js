@@ -28,12 +28,15 @@ function genObstacle(state) {
 
     let obstacleHeight = intBetween(minObstacleHeight, maxObstacleHeight);
 
+    let obstacleWidth = obstacleHeight * opt.ratio;
+
     let obstacleY = intBetween(0, height);
 
     return {
         height: obstacleHeight,
-        width: opt.width,
+        width: obstacleWidth,
         x: width,
+        src: opt.src,
         y: obstacleY,
         top: obstacleY - (obstacleHeight / 2),
         scored: false, // has the player recieved a score for this obstacle?
@@ -59,6 +62,7 @@ function birdCollided(bird, state) {
 
     let position = bird.get("position");
     let bottom = state.get("height");
+
 
     let bx = bird.get("x");
     let bw = bird.get("width");
@@ -112,7 +116,8 @@ function birdCollided(bird, state) {
         }, false);
     }, false);
 
-    return position > bottom - (bird.get("height") / 2) ||
+    return position > bottom + 100 ||
+        position < -100 ||
         collided;
 }
 

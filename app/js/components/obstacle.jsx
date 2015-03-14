@@ -12,7 +12,9 @@ const Obstacle = React.createClass({
 
 		x: React.PropTypes.number.isRequired,
 
-		top: React.PropTypes.number.isRequired
+		top: React.PropTypes.number.isRequired,
+
+		src: React.PropTypes.string.isRequired
 
 	},
 
@@ -24,7 +26,8 @@ const Obstacle = React.createClass({
 			position: "absolute",
 			left: this.props.x,
 			top: parseInt(this.props.top),
-			backgroundColor: "black"
+			backgroundImage: "url(" + this.props.src + ")",
+			backgroundSize: "cover"
 		};
 
 

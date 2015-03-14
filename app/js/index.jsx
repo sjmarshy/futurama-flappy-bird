@@ -54,11 +54,14 @@ const gameState = new Baobab({
 
 		obstacle: {
 
+			src: "/images/futurama-brain.png",
+
 			obstacles: [],
 
 			velocity: 3,
 
-			width: 150,
+			ratio: 1.39,
+
 			height: {
 				min: 0.35,
 				max: 0.55
