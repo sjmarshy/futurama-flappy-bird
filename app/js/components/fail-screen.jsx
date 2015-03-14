@@ -29,19 +29,30 @@ const FailScreen = React.createClass({
 	render: function () {
 
 		let style = {
+			main: {
+				height: "auto",
+				alignSelf: "center",
+				fontFamily: "sans-serif",
+				textAlign: "center",
+				color: "white"
+			},
 			title: {
-				color: "red",
-				fontSize: 18
+				fontSize: 18,
+				padding: 10
 			},
 			span: {
 				fontSize: 14,
+				padding: 10,
+				margin: 8,
+				backgroundColor: "white",
 				color: "red",
+				display: "block",
 				cursor: "pointer"
 			}
 		};
 
 		return (
-			<div>
+			<div style={style.main}>
 				<h2 style={style.title}>
 					Fail! You got {this.props.score.get()}
 				</h2>

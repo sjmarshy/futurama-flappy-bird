@@ -25,8 +25,6 @@ const gameState = new Baobab({
 
 		pause: true, // we'll start the game paused
 
-		menu: true, // and when a menu is implemented we'll start with it showing
-
 		fail: false,
 
 		reset: false, // we use this as a trigger to reset the game
@@ -100,7 +98,7 @@ const GameContainer = React.createClass({
 			return <Obstacle key={o.created} {...o} />;
 		});
 
-		let menu = data.menu ? <Menu/> : null;
+		let menu = data.pause && !data.fail ? <Menu/> : null;
 		let failScreen = data.fail ?
 			<FailScreen
 				highscore={this.cursor.get("highscore")}
@@ -170,8 +168,9 @@ function frame() {
 
 	// as our keyboard buffer is only looking for the
 	// space key, this should only exist when a space
-	// key has been hit
-	if (key) {
+	// key has been hit. We also need to make sure that we
+	// don't unpause the game when it's already failed
+	if (key && !state.get("fail")) {
 		velocityMod = state.get("bird", "maxVelocity");
 		state.set("pause", false);
 	}

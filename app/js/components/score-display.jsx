@@ -13,7 +13,10 @@ const ScoreDisplay = React.createClass({
 	render: function () {
 
 		return (
-			<div>
+			<div style={{
+				color: "white",
+				fontFamily: "sans-serif"
+			}}>
 				<span>{this.props.score}</span>
 			</div>
 		);

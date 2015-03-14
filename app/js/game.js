@@ -23,18 +23,26 @@ function genObstacle(state) {
     let height = state.get("height");
     let width = state.get("width");
 
-    let minObstacleHeight = height * opt.height.min;
-    let maxObstacleHeight = height * opt.height.max;
+    let heightMod = intBetween(opt.height.min, opt.height.max);
 
-    let obstacleHeight = intBetween(minObstacleHeight, maxObstacleHeight);
+    let obstacleHeight = height * heightMod;
 
     let obstacleWidth = obstacleHeight * opt.ratio;
 
     let obstacleY = intBetween(0, height);
 
+
+    let forwardVelocity = opt.velocity;
+    // change speed slightly based on  height
+    //
+    let minForwardVelocity = forwardVelocity - heightMod;
+    let maxForwardVelocity = forwardVelocity + heightMod;
+
     return {
+        heightMod: heightMod,
         height: obstacleHeight,
         width: obstacleWidth,
+        velocity: intBetween(minForwardVelocity, maxForwardVelocity),
         x: width,
         src: opt.src,
         y: obstacleY,
@@ -144,12 +152,11 @@ function updateBird(birdCursor, velocityMod) {
 function moveObstacles(state) {
 
     let os = state.get("obstacle", "obstacles");
-    let forwardVelocity = state.get("obstacle", "velocity");
     let width = state.get("width");
 
     state.select("obstacle").set("obstacles", os.map(function(o) {
 
-        o.x -= forwardVelocity;
+        o.x -= o.velocity;
 
         if (o.x < -o.width) {
             return null;
