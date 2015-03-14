@@ -2,14 +2,23 @@
 
 const React = require("react");
 
+function rotateBy(velocity) {
+	let minTurn = 1;
+	let maxTurn = 0;
+
+	let turn = (velocity / 100) * (maxTurn - minTurn) + minTurn;
+
+	return turn;
+}
+
 const Bird = React.createClass({
 
 	propTypes: {
 		position: React.PropTypes.number.isRequired,
+		velocity: React.PropTypes.number.isRequired,
+		src: React.PropTypes.string.isRequired,
 		height: React.PropTypes.number.isRequired,
 		width: React.PropTypes.number.isRequired,
-		// x is set - it's just a way to make sure
-		// the bird is always displayed in the centre widthways
 		x: React.PropTypes.number.isRequired
 	},
 
@@ -21,7 +30,9 @@ const Bird = React.createClass({
 			position: "relative",
 			top: this.props.position - (this.props.height / 2),
 			left: this.props.x - (this.props.width / 2),
-			backgroundColor: "black"
+			backgroundImage: "url(" + this.props.src + ")",
+			backgroundSize: "cover",
+			transform: "rotate(" + rotateBy(this.props.velocity) + "turn)"
 		};
 
 		return (

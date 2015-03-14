@@ -41,19 +41,22 @@ const gameState = new Baobab({
 
 		bird: {
 			velocity: 0,
+			maxVelocity: 12,
+			minVelocity: -6,
 			// position is the variable amount on the y axis
 			// we'll start the bird in the centre of the screen
 			position: height / 2,
 			x: width / 2,
-			height: 50,
-			width: 50
+			height: 30,
+			width: 75,
+			src: "/images/ship.png"
 		},
 
 		obstacle: {
 
 			obstacles: [],
 
-			velocity: 7,
+			velocity: 3,
 
 			width: 150,
 			height: {
@@ -64,8 +67,8 @@ const gameState = new Baobab({
 			// the min/max number of seconds between obstacles
 			// appearing
 			timing: {
-				min: 1000,
-				max: 4500
+				min: 2500,
+				max: 6500
 			}
 		},
 
@@ -166,7 +169,7 @@ function frame() {
 	// space key, this should only exist when a space
 	// key has been hit
 	if (key) {
-		velocityMod = 20;
+		velocityMod = state.get("bird", "maxVelocity");
 		state.set("pause", false);
 	}
 

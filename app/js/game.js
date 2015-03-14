@@ -118,18 +118,20 @@ function birdCollided(bird, state) {
 
 function updateBird(birdCursor, velocityMod) {
 
+    let velocity = birdCursor.get("velocity");
+
     if (velocityMod > 0) {
         birdCursor.set("velocity", velocityMod);
+        velocity = velocityMod;
     }
 
-    let velocity = birdCursor.get("velocity");
     let birdY = birdCursor.get("position");
     let newPosition = birdY - velocity;
 
     birdCursor.set("position", newPosition);
 
-    if (velocity > -10) {
-        birdCursor.set("velocity", velocity - 1);
+    if (velocity > birdCursor.get("minVelocity")) {
+        birdCursor.set("velocity", velocity - 0.6);
     }
 
 }
@@ -147,7 +149,6 @@ function moveObstacles(state) {
         if (o.x < -o.width) {
             return null;
         } else if (o.x < width / 2 && !o.scored) {
-            console.log("hey");
             let score = state.get("score");
             state.set("score", score + 1);
             o.scored = true;
