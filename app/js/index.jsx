@@ -33,7 +33,7 @@ const gameState = new Baobab({
 
 		score: 0,
 
-		highscore: window.localStorage.getItem("highscore") || 0,
+		highscore: parseInt(window.localStorage.getItem("highscore"), 10) || 0,
 
 		height: height,
 

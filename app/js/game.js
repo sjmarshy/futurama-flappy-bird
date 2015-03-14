@@ -8,9 +8,9 @@ function intBetween(min, max) {
 
 function setHighScore(score) {
 
-    let hs = window.localStorage.getItem("highscore");
+    let hs = parseInt(window.localStorage.getItem("highscore"), 10);
 
-    if (!hs || hs < score) {
+    if (!hs || hs < parseInt(score, 10)) {
         window.localStorage.setItem("highscore", score);
         return score;
     }
@@ -94,10 +94,7 @@ function birdCollided(bird, state) {
                 y > t2 &&
                 y < b2;
 
-            console.log(collision);
-
             return collision;
-
         }, false);
     }, false);
 
