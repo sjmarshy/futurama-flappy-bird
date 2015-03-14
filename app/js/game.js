@@ -41,6 +41,20 @@ function genObstacle(state) {
     };
 }
 
+function moveBackground(backgroundCursor) {
+
+    let pos = backgroundCursor.get("position");
+    let width = backgroundCursor.get("width");
+
+    if (pos < 0) {
+        pos = width;
+    } else {
+        pos -= 1;
+    }
+
+    backgroundCursor.set("position", pos);
+}
+
 function birdCollided(bird, state) {
 
     let position = bird.get("position");
@@ -79,14 +93,14 @@ function birdCollided(bird, state) {
         let b2 = o.top + o.height;
         let r2 = l2 + o.width;
 
-        return vertices.reduce(function(m, v) {
+        return vertices.reduce(function(memo, v) {
 
             let x = v[0],
                 y = v[1];
 
 
-            if (m) {
-                return m;
+            if (memo) {
+                return memo;
             }
 
             let collision = x > l2 &&
@@ -182,7 +196,8 @@ function updateGame(state, velocityMod) {
 
     if (!pause && !fail) {
 
-        // bird movement first;
+        moveBackground(state.select("background"));
+
         updateBird(bird, velocityMod);
 
         if (birdCollided(bird, state)) {

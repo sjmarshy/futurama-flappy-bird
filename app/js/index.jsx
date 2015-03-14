@@ -67,6 +67,12 @@ const gameState = new Baobab({
 				min: 1000,
 				max: 4500
 			}
+		},
+
+		background: {
+			src: "/images/bkg.png",
+			width: width,
+			position: width
 		}
 
 	}
@@ -103,7 +109,8 @@ const GameContainer = React.createClass({
 		let style = {
 			height: data.height,
 			width: data.width,
-			backgroundColor: "grey",
+			backgroundImage: "url(" + data.background.src + ")",
+			backgroundPosition: data.background.position,
 			margin: 0,
 			padding: 0,
 			overflow: "hidden",
