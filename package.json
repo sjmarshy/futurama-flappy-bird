@@ -13,6 +13,7 @@
   "private": true,
   "eslintConfig": {
     "ecmaFeatures": {
+      "arrowFunctions": true,
       "blockBindings": true,
       "jsx": true
     },

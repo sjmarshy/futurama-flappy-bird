@@ -82,6 +82,18 @@ const gameState = new Baobab({
 	}
 });
 
+function resetGame(state) {
+	state.set("pause", true);
+	state.set("fail", false);
+	state.set("score", 0);
+}
+
+function resetGameClosure(state) {
+	return () => {
+		resetGame(state);
+	};
+}
+
 // GameContainer - the root React component that will re-render all
 // 	relevant children when the state changes.
 const GameContainer = React.createClass({
@@ -101,9 +113,10 @@ const GameContainer = React.createClass({
 		let menu = data.pause && !data.fail ? <Menu/> : null;
 		let failScreen = data.fail ?
 			<FailScreen
+				onReset={resetGameClosure(this.cursor)}
 				highscore={this.cursor.get("highscore")}
-				score={this.cursor.select("score")}
-				fail={this.cursor.select("fail")} /> :
+				score={this.cursor.get("score")}
+				fail={this.cursor.get("fail")} /> :
 			null;
 
 		let score = data.fail ?
@@ -159,6 +172,7 @@ React.render(
 
 var keys = new Keyboard("<space>");
 
+
 // handle the Keyboard and update game state
 function frame() {
 
@@ -173,6 +187,8 @@ function frame() {
 	if (key && !state.get("fail")) {
 		velocityMod = state.get("bird", "maxVelocity");
 		state.set("pause", false);
+	} else if (key && state.get("fail")) {
+		resetGame(state);
 	}
 
 	game.updateGame(state, velocityMod);
